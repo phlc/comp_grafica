@@ -1,1 +1,1 @@
-# comp_grafica
+# Computer Graphics Assignments Repository
