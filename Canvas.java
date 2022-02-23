@@ -27,7 +27,7 @@ class Canvas extends JPanel{
 
     //Construtores
     public Canvas(){
-        points = new int[2][30];
+        points = new int[2][12];
         insertedPoints=0;
         maxPoints = 2;
         isLine = isDDA = true;
@@ -96,10 +96,11 @@ class Canvas extends JPanel{
     }
 
     public void plot(){
+        ready();
         if(this.isLine){
             if(this.isDDA){
-                plotLineDDA(points[0][0], points[0][1],
-                            points[1][0], points[1][1]);
+                plotLineDDA(points[0][0], points[1][0],
+                            points[0][1], points[1][1]);
             }
             else if(this.isBresenham){
                 plotLineBresenham();
@@ -129,8 +130,6 @@ class Canvas extends JPanel{
 
         x=x1; y=y1;
 
-
-        ready();
         renderPoint((int)Math.round(x), (int)Math.round(y));
         for(int i=0; i<steps; i++){
             x+=addX;
@@ -148,6 +147,16 @@ class Canvas extends JPanel{
     }
 
     private void plotPolygon(){
+        if(this.isDDA){
+            for(int i=1; i<this.insertedPoints; i++){
+                plotLineDDA(points[0][i-1], points[1][i-1],
+                            points[0][i], points[1][i]);
+            }
+            plotLineDDA(points[0][insertedPoints-1], points[1][insertedPoints-1],
+                            points[0][0], points[1][0]);
+        }
+        else if(this.isBresenham){
 
+        }
     }
 }
