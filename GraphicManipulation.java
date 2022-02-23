@@ -69,14 +69,17 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         lineBtn = new JRadioButton("Line", true);
         lineBtn.setBounds(504, 2, 80, 30);
         lineBtn.setOpaque(true);
+        lineBtn.addMouseListener(this);
 
         circleBtn = new JRadioButton("Circle");
         circleBtn.setBounds(584, 2, 80, 30);
         circleBtn.setOpaque(true);
+        circleBtn.addMouseListener(this);
 
         polygonBtn = new JRadioButton("Polygon");
         polygonBtn.setBounds(664, 2, 90, 30);
         polygonBtn.setOpaque(true);
+        polygonBtn.addMouseListener(this);
 
         ButtonGroup typeGroup = new ButtonGroup();
         typeGroup.add(lineBtn); typeGroup.add(circleBtn); typeGroup.add(polygonBtn);
@@ -110,10 +113,12 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         ddaBtn = new JRadioButton("DDA", true);
         ddaBtn.setBounds(504, 34, 80, 30);
         ddaBtn.setOpaque(true);
+        ddaBtn.addMouseListener(this);
 
         bresenhamBtn = new JRadioButton("Bresenham");
         bresenhamBtn.setBounds(584, 34, 120, 30);
         bresenhamBtn.setOpaque(true);
+        bresenhamBtn.addMouseListener(this);
 
         ButtonGroup rasterGroup = new ButtonGroup();
         rasterGroup.add(ddaBtn); rasterGroup.add(bresenhamBtn);
@@ -145,11 +150,14 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
     //Evento Mouse Click
     @Override
-    public void mouseClicked(MouseEvent e) {
+    public void mousePressed(MouseEvent e) {
+        //Adicionar pontos no canvas
         if(e.getSource() == canvas && setPointsBtn.isPressed){
             canvas.addPoint(e.getX(), e.getY());
         }
-        else if(e.getSource() == setPointsBtn && !setPointsBtn.isPressed){
+        //Controle botão setPointsBtn
+        else if(e.getSource() == setPointsBtn && !setPointsBtn.isPressed 
+                                              && setPointsBtn.isEnabled()){
             canvas.ready();
             setPointsBtn.pressBtn(true);
 
@@ -161,7 +169,9 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             restartBtn.pressBtn(false);
             enableRadio(false);
         }
-        else if(e.getSource() == plotBtn && !plotBtn.isPressed){
+        //Controle botão plotBtn
+        else if(e.getSource() == plotBtn && !plotBtn.isPressed 
+                                         && plotBtn.isEnabled()){
             setPointsBtn.pressBtn(false);
             setPointsBtn.setEnabled(false);
 
@@ -172,8 +182,12 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
             restartBtn.pressBtn(false);
             enableRadio(false);
+
+            canvas.plot();
         }
-        else if(e.getSource() == transformBtn && !transformBtn.isPressed){
+        //Controle botão transformBtn
+        else if(e.getSource() == transformBtn && !transformBtn.isPressed 
+                                              && transformBtn.isEnabled()){
             setPointsBtn.pressBtn(false);
             setPointsBtn.setEnabled(false);
 
@@ -186,6 +200,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             
             enableRadio(false);
         }
+        //Controle botão restartBtn
         else if(e.getSource() == restartBtn){
             setPointsBtn.pressBtn(false);
             setPointsBtn.setEnabled(true);
@@ -200,18 +215,80 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             enableRadio(true);
             canvas.clear();
         }
+        //Controle botão pickColer
         else if(e.getSource() == pickColor){
             Color choice = JColorChooser.showDialog(canvas, "Choose your Color", Color.BLACK);
             if(choice != null) canvas.color = choice.getRGB();
+        }
+        //Controle botão lineBtn
+        else if(e.getSource() == lineBtn && !canvas.isLine 
+                                         && lineBtn.isEnabled()){
+            canvas.isLine = true;
+            canvas.isCircle = false;
+            canvas.isPolygon = false;
+            canvas.maxPoints = 2;
+
+            canvas.isDDA = true;
+            canvas.isBresenham = false;
+            ddaBtn.setEnabled(true);
+            bresenhamBtn.setEnabled(true);
+            ddaBtn.setSelected(true);
+        }
+        //Controle botão circleBtn
+        else if(e.getSource() == circleBtn && !canvas.isCircle      
+                                           && circleBtn.isEnabled()){
+            canvas.isLine = false;
+            canvas.isCircle = true;
+            canvas.isPolygon = false;
+            canvas.maxPoints = 2;
+
+            canvas.isBresenham = true;
+            canvas.isDDA = false;
+            bresenhamBtn.setSelected(true);
+            ddaBtn.setEnabled(false);
+            bresenhamBtn.setEnabled(false);
+            
+        }
+        //Controle botão polygonBtn
+        else if(e.getSource() == polygonBtn && !canvas.isPolygon 
+                                            && polygonBtn.isEnabled()){
+            canvas.isLine = false;
+            canvas.isCircle = false;
+            canvas.isPolygon = true;
+            canvas.maxPoints = 12;
+
+            canvas.isDDA = true;
+            canvas.isBresenham = false;
+            ddaBtn.setEnabled(true);
+            bresenhamBtn.setEnabled(true);
+            ddaBtn.setSelected(true);
+        }
+
+        //Controle botão ddaBtn
+        else if(e.getSource() == ddaBtn && !canvas.isDDA 
+                                            && ddaBtn.isEnabled()){
+
+            canvas.isDDA = true;
+            canvas.isBresenham = false;
+        }
+
+        //Controle botão bresenhamBtn
+        else if(e.getSource() == bresenhamBtn && !canvas.isBresenham 
+                                            && bresenhamBtn.isEnabled()){
+            
+            canvas.isDDA = false;
+            canvas.isBresenham = true;
         }
     }
 
     //Métodos das Interfaces
     @Override
-    public void actionPerformed(ActionEvent e) {}
+    public void actionPerformed(ActionEvent e) {
+    }
 
     @Override
-    public void mousePressed(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+    }
 
     @Override
     public void mouseReleased(MouseEvent e) {}
