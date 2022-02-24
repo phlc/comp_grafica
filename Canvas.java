@@ -73,7 +73,8 @@ class Canvas extends JPanel{
     }
 
     private void renderPoint(int x, int y){
-        buffer.setRGB(x, y, color);
+        if(x<500 && x>=0 && y<500 && y>=0)
+            buffer.setRGB(x, y, color);
     }
 
     public void clear(){
@@ -103,16 +104,18 @@ class Canvas extends JPanel{
                             points[0][1], points[1][1]);
             }
             else if(this.isBresenham){
-                plotLineBresenham();
+                plotLineBresenham(points[0][0], points[1][0],
+                                  points[0][1], points[1][1]);
             }
         }
         else if(this.isCircle){
-            plotCircle();
+            plotCircle(points[0][0], points[1][0],
+                       points[0][1], points[1][1]);
         }
         else if(this.isPolygon){
             plotPolygon();
         }
-
+        repaint();
     }
 
     private void plotLineDDA(int x1, int y1, int x2, int y2){
@@ -138,12 +141,71 @@ class Canvas extends JPanel{
         }
     }
 
-    private void plotLineBresenham(){
+    private void plotLineBresenham(int x1, int y1, int x2, int y2){
+        int dx, dy, x, y, c1, c2, p, addX, addY;
 
+        dx = x2 - x1;
+        dy = y2 - y1;
+
+        if(dx>=0)addX = 1;
+        else{addX = -1; dx = -1*dx;}
+
+        if(dy>=0)addY = 1;
+        else{addY = -1; dy = -1*dy;}
+
+        x=x1; y=y1;
+        renderPoint(x, y);
+
+        if(dy<dx){
+            p = 2*dy - dx;
+            c1 = 2*dy;
+            c2 = 2*(dy-dx);
+            for(int i=0; i<dx; i++){
+                x += addX;
+                if(p<0) p += c1;
+                else{y += addY; p += c2;}
+                renderPoint(x, y);
+            }
+        }
+        else{
+            p = 2*dx -dy;
+            c1 = 2*dx;
+            c2 = 2*(dx-dy);
+            for(int i=0; i<dy; i++){
+                y += addY;
+                if(p<0) p += c1;
+                else{x += addX; p += c2;}
+                renderPoint(x, y);
+            }
+        }
     }
 
-    private void plotCircle(){
+    private void renderCirclePoints(int xc, int yc, int x, int y){
+        renderPoint(xc+x, yc+y);
+        renderPoint(xc-x, yc+y);
+        renderPoint(xc+x, yc-y);
+        renderPoint(xc-x, yc-y);
+        renderPoint(xc+y, yc+x);
+        renderPoint(xc-y, yc+x);
+        renderPoint(xc+y, yc-x);
+        renderPoint(xc-y, yc-x);
+    }
 
+    private void plotCircle(int xc, int yc, int x2, int y2){
+        int x, y, p, r;
+
+        //Calcular raio
+        r = (int)Math.round(Math.sqrt((x2-xc)*(x2-xc) + (y2-yc)*(y2-yc)));
+
+        x = 0; y = r; p = 3 - 2*r;
+        renderCirclePoints(xc, yc, x, y);
+        while(x<y){
+            if(p<0) p += 4*x + 6;
+            else{ p += 4*(x-y) + 10; y-=1;}
+            x+=1;
+            renderCirclePoints(xc, yc, x, y);
+        }
+        
     }
 
     private void plotPolygon(){
@@ -156,7 +218,12 @@ class Canvas extends JPanel{
                             points[0][0], points[1][0]);
         }
         else if(this.isBresenham){
-
+            for(int i=1; i<this.insertedPoints; i++){
+                plotLineBresenham(points[0][i-1], points[1][i-1],
+                            points[0][i], points[1][i]);
+            }
+            plotLineBresenham(points[0][insertedPoints-1], points[1][insertedPoints-1],
+                            points[0][0], points[1][0]);
         }
     }
 }
