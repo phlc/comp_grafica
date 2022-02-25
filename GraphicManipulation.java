@@ -46,6 +46,39 @@ class App extends JFrame implements ActionListener, MouseInputListener{
     JRadioButton ddaBtn;
     JRadioButton bresenhamBtn;
 
+    //Componentes de Transformação
+    //Translação
+    JPanel translationPanel;
+    JLabel translationLabelX;
+    JLabel translationLabelY;
+    JTextField translationTextX;
+    JTextField translationTextY;
+    JButton translationSubmitBtn;
+
+    //Escala
+    JPanel scalePanel;
+    JLabel scaleLabelX;
+    JLabel scaleLabelY;
+    JTextField scaleTextX;
+    JTextField scaleTextY;
+    JButton scaleSubmitBtn;
+
+    //Rotação
+    JPanel rotationPanel;
+    JLabel rotationLabel;
+    JTextField rotationAngle;
+    JButton rotationSubmitBtn;
+
+    //Reflexão
+    JPanel reflectionPanel;
+    JLabel reflectionLabel;
+    JButton reflectionX;
+    JButton reflectionY;
+    JButton reflectionXY;
+
+    //Recorte
+
+
 
     //Construtor da Classe MyFrame
     public App(){
@@ -107,7 +140,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         //Configurações Botões Comuns
         pickColor = new JButton("Pick Color");
         pickColor.addMouseListener(this);
-        pickColor.setBounds(504, 66, 80, 40);
+        pickColor.setBounds(504, 500, 80, 40);
 
         //Configurações radioButtons de rasterização
         ddaBtn = new JRadioButton("DDA", true);
@@ -123,6 +156,97 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         ButtonGroup rasterGroup = new ButtonGroup();
         rasterGroup.add(ddaBtn); rasterGroup.add(bresenhamBtn);
 
+        //Configurações Componentes de Translação
+        translationPanel = new JPanel();
+        translationPanel.setBounds(504, 66, 220, 30);
+        translationPanel.setLayout(null);
+
+        translationLabelX = new JLabel("Translations X:");
+        translationLabelX.setBounds(4, 0, 100, 30);
+        
+        translationTextX = new JTextField(3);
+        translationTextX.setBounds(104, 0, 40, 30);
+        
+        translationLabelY = new JLabel("Y:");
+        translationLabelY.setBounds(148, 0, 20, 30);
+    
+        translationTextY = new JTextField(3);
+        translationTextY.setBounds(164, 0, 40, 30);
+        
+        translationSubmitBtn = new JButton("Translate");
+        translationSubmitBtn.setBounds(718, 66, 82, 30);
+        translationSubmitBtn.setOpaque(true);
+
+        translationPanel.add(translationLabelX);
+        translationPanel.add(translationTextX);
+        translationPanel.add(translationLabelY);
+        translationPanel.add(translationTextY);
+
+        //Configurações Componentes de Escala
+        scalePanel = new JPanel();
+        scalePanel.setBounds(504, 98, 220, 30);
+        scalePanel.setLayout(null);
+
+        scaleLabelX = new JLabel("Scales           X:");
+        scaleLabelX.setBounds(4, 0, 100, 30);
+        
+        scaleTextX = new JTextField(3);
+        scaleTextX.setBounds(104, 0, 40, 30);
+        
+        scaleLabelY = new JLabel("Y:");
+        scaleLabelY.setBounds(148, 0, 20, 30);
+    
+        scaleTextY = new JTextField(3);
+        scaleTextY.setBounds(164, 0, 40, 30);
+        
+        scaleSubmitBtn = new JButton("Scale");
+        scaleSubmitBtn.setBounds(718, 98, 82, 30);
+        scaleSubmitBtn.setOpaque(true);
+
+        scalePanel.add(scaleLabelX);
+        scalePanel.add(scaleTextX);
+        scalePanel.add(scaleLabelY);
+        scalePanel.add(scaleTextY);
+
+        //Configurações Componentes de Rotação
+        rotationPanel = new JPanel();
+        rotationPanel.setBounds(504, 130, 220, 30);
+        rotationPanel.setLayout(null);
+
+        rotationLabel = new JLabel("Rotations           Angle:");
+        rotationLabel.setBounds(4, 0, 150, 30);
+        
+        rotationAngle = new JTextField(3);
+        rotationAngle.setBounds(164, 0, 40, 30);
+        
+        rotationSubmitBtn = new JButton("Rotate");
+        rotationSubmitBtn.setBounds(718, 130, 82, 30);
+        rotationSubmitBtn.setOpaque(true);
+
+        rotationPanel.add(rotationLabel);
+        rotationPanel.add(rotationAngle);
+
+        //Configurações Componentes de Reflexão
+        reflectionPanel = new JPanel();
+        reflectionPanel.setBounds(504, 162, 110, 30);
+        reflectionPanel.setLayout(null);
+
+        reflectionLabel = new JLabel("Reflections:");
+        reflectionLabel.setBounds(4, 0, 110, 30);
+        reflectionPanel.add(reflectionLabel);
+
+        reflectionX = new JButton("X");
+        reflectionX.setBounds(614, 162, 60, 30);
+        reflectionX.setOpaque(true);
+
+        reflectionY = new JButton("Y");
+        reflectionY.setBounds(674, 162, 60, 30);
+        reflectionY.setOpaque(true);
+
+        reflectionXY = new JButton("XY");
+        reflectionXY.setBounds(734, 162, 60, 30);
+        reflectionXY.setOpaque(true);
+        
 
         //Montagem dos Componentes
         this.add(canvas);
@@ -134,6 +258,18 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         this.add(ddaBtn);
         this.add(bresenhamBtn);
         this.add(pickColor);
+        this.add(translationPanel);
+        this.add(translationSubmitBtn);
+        this.add(scalePanel);
+        this.add(scaleSubmitBtn);
+        this.add(rotationPanel);
+        this.add(rotationSubmitBtn);
+        this.add(reflectionPanel);
+        this.add(reflectionX);
+        this.add(reflectionY);
+        this.add(reflectionXY);
+        
+
 
         //Mostrar Canvas
         this.setVisible(true);
