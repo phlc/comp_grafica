@@ -226,4 +226,12 @@ class Canvas extends JPanel{
                             points[0][0], points[1][0]);
         }
     }
+
+    public void translate(int x, int y){
+        for(int i=0; i<insertedPoints; i++){
+            points[0][i] += x;
+            points[1][i] += y;
+        }
+        plot();
+    }
 }

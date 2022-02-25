@@ -176,6 +176,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         translationSubmitBtn = new JButton("Translate");
         translationSubmitBtn.setBounds(718, 66, 82, 30);
         translationSubmitBtn.setOpaque(true);
+        translationSubmitBtn.addMouseListener(this);
 
         translationPanel.add(translationLabelX);
         translationPanel.add(translationTextX);
@@ -202,6 +203,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         scaleSubmitBtn = new JButton("Scale");
         scaleSubmitBtn.setBounds(718, 98, 82, 30);
         scaleSubmitBtn.setOpaque(true);
+        scaleSubmitBtn.addMouseListener(this);
 
         scalePanel.add(scaleLabelX);
         scalePanel.add(scaleTextX);
@@ -222,6 +224,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         rotationSubmitBtn = new JButton("Rotate");
         rotationSubmitBtn.setBounds(718, 130, 82, 30);
         rotationSubmitBtn.setOpaque(true);
+        rotationSubmitBtn.addMouseListener(this);
 
         rotationPanel.add(rotationLabel);
         rotationPanel.add(rotationAngle);
@@ -238,14 +241,17 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         reflectionX = new JButton("X");
         reflectionX.setBounds(614, 162, 60, 30);
         reflectionX.setOpaque(true);
+        reflectionX.addMouseListener(this);
 
         reflectionY = new JButton("Y");
         reflectionY.setBounds(674, 162, 60, 30);
         reflectionY.setOpaque(true);
+        reflectionY.addMouseListener(this);
 
         reflectionXY = new JButton("XY");
         reflectionXY.setBounds(734, 162, 60, 30);
         reflectionXY.setOpaque(true);
+        reflectionXY.addMouseListener(this);
         
 
         //Montagem dos Componentes
@@ -269,11 +275,45 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         this.add(reflectionY);
         this.add(reflectionXY);
         
-
+        
+        //Desabilitar botões de Transformação
+        enableTransformations(false);
 
         //Mostrar Canvas
         this.setVisible(true);
 
+    }
+
+    private void enableTransformations(boolean enable){
+
+        //Translação
+        translationPanel.setEnabled(enable);
+        translationLabelX.setEnabled(enable);
+        translationLabelY.setEnabled(enable);
+        translationTextX.setEnabled(enable);
+        translationTextY.setEnabled(enable);
+        translationSubmitBtn.setEnabled(enable);
+
+        //Escala
+        scalePanel.setEnabled(enable);
+        scaleLabelX.setEnabled(enable);
+        scaleLabelY.setEnabled(enable);
+        scaleTextX.setEnabled(enable);
+        scaleTextY.setEnabled(enable);
+        scaleSubmitBtn.setEnabled(enable);
+
+        //Rotação
+        rotationPanel.setEnabled(enable);
+        rotationLabel.setEnabled(enable);
+        rotationAngle.setEnabled(enable);
+        rotationSubmitBtn.setEnabled(enable);
+
+        //Reflexão
+        reflectionPanel.setEnabled(enable);
+        reflectionLabel.setEnabled(enable);
+        reflectionX.setEnabled(enable);
+        reflectionY.setEnabled(enable);
+        reflectionXY.setEnabled(enable);
     }
 
     private void enableRadio(boolean enable){
@@ -333,6 +373,8 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             transformBtn.pressBtn(true);
 
             restartBtn.pressBtn(false);
+
+            enableTransformations(true);
             
             enableRadio(false);
         }
@@ -349,6 +391,12 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
             restartBtn.pressBtn(true);
             enableRadio(true);
+
+            enableTransformations(false);
+
+            translationTextX.setText("");
+            translationTextY.setText("");
+
             canvas.clear();
         }
         //Controle botão pickColer
@@ -414,6 +462,22 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             
             canvas.isDDA = false;
             canvas.isBresenham = true;
+        }
+
+        //Controle botão translate
+        else if(e.getSource() == translationSubmitBtn && 
+                                 translationSubmitBtn.isEnabled()){
+            try{
+                String textX = translationTextX.getText();
+                String textY = translationTextY.getText();
+                double newX = Double.parseDouble(textX);
+                double newY = Double.parseDouble(textY);
+                canvas.translate((int)Math.round(newX), -1*(int)Math.round(newY));
+            }catch(Exception exp){
+                translationTextX.setText("");
+                translationTextY.setText("");
+                JOptionPane.showMessageDialog(this, ("Inputs must be numbers\nIntegers or Floats"));
+            }
         }
     }
 
