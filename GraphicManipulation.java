@@ -397,6 +397,11 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             translationTextX.setText("");
             translationTextY.setText("");
 
+            scaleTextX.setText("");
+            scaleTextY.setText("");
+
+            rotationAngle.setText("");
+
             canvas.clear();
         }
         //Controle botão pickColer
@@ -417,6 +422,12 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             ddaBtn.setEnabled(true);
             bresenhamBtn.setEnabled(true);
             ddaBtn.setSelected(true);
+
+            scaleTextX.setVisible(true);
+            scaleLabelY.setVisible(true);
+            scaleLabelX.setText("Scales           X:");
+            scaleLabelX.setBounds(4, 0, 100, 30);
+
         }
         //Controle botão circleBtn
         else if(e.getSource() == circleBtn && !canvas.isCircle      
@@ -431,6 +442,12 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             bresenhamBtn.setSelected(true);
             ddaBtn.setEnabled(false);
             bresenhamBtn.setEnabled(false);
+
+            scaleTextX.setVisible(false);
+            scaleLabelY.setVisible(false);
+            scaleLabelX.setText("Scales                 Radius:");
+            scaleLabelX.setBounds(4, 0, 160, 30);
+
             
         }
         //Controle botão polygonBtn
@@ -446,6 +463,11 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             ddaBtn.setEnabled(true);
             bresenhamBtn.setEnabled(true);
             ddaBtn.setSelected(true);
+
+            scaleTextX.setVisible(true);
+            scaleLabelY.setVisible(true);
+            scaleLabelX.setText("Scales           X:");
+            scaleLabelX.setBounds(4, 0, 100, 30);
         }
 
         //Controle botão ddaBtn
@@ -479,6 +501,57 @@ class App extends JFrame implements ActionListener, MouseInputListener{
                 JOptionPane.showMessageDialog(this, ("Inputs must be numbers\nIntegers or Floats"));
             }
         }
+
+        //Controle botão scale
+        else if(e.getSource() == scaleSubmitBtn && 
+                                 scaleSubmitBtn.isEnabled()){
+            try{
+                String textX = scaleTextX.getText();
+                String textY = scaleTextY.getText();
+                double newX;
+                double newY = Double.parseDouble(textY);
+                if(circleBtn.isSelected()) newX=newY;
+                else newX = Double.parseDouble(textX);
+                if(newX <=0 || newY<=0) throw new Exception();
+                canvas.scale(newX, newY);
+            }catch(Exception exp){
+                scaleTextX.setText("");
+                scaleTextY.setText("");
+                JOptionPane.showMessageDialog(this, ("Inputs must be numbers greater than 0\nIntegers or Floats\n"));
+            }
+        }
+
+        //Controle botão rotate
+        else if(e.getSource() == rotationSubmitBtn && 
+                                 rotationSubmitBtn.isEnabled()){
+            try{
+                String textA = rotationAngle.getText();
+                double angle = Double.parseDouble(textA);
+                canvas.rotate(-1*angle);
+            }catch(Exception exp){
+                rotationAngle.setText("");
+                JOptionPane.showMessageDialog(this, ("Angle must be a number\nIntegers or Floats\n"));
+            }
+        }
+
+        //Controle botão reflectionX
+        else if(e.getSource() == reflectionX && 
+                                 reflectionX.isEnabled()){
+            canvas.reflectX();
+        }
+
+        //Controle botão reflectionY
+        else if(e.getSource() == reflectionY && 
+                                 reflectionY.isEnabled()){
+            canvas.reflectY();
+        }
+
+        //Controle botão reflectionX
+        else if(e.getSource() == reflectionXY && 
+                                 reflectionXY.isEnabled()){
+            canvas.reflectXY();
+        }
+
     }
 
     //Métodos das Interfaces

@@ -234,4 +234,92 @@ class Canvas extends JPanel{
         }
         plot();
     }
+
+    public void scale(double x, double y){
+        int x1, y1;
+        x1 = points[0][0];
+        y1 = points[1][0];
+
+        translate(-x1, -y1);
+        
+        for(int i=0; i<insertedPoints; i++){
+            points[0][i] *= x;
+            points[1][i] *= y;
+        }
+   
+        translate(x1, y1);
+
+        plot();
+    }
+
+    public void rotate(double theta){
+        int x1, y1;
+        x1 = points[0][0];
+        y1 = points[1][0];
+
+        translate(-x1, -y1);
+        
+        for(int i=0; i<insertedPoints; i++){
+            double x = (double) points[0][i];
+            double y = (double) points[1][i];
+            points[0][i] = (int)Math.round(x * Math.cos(theta) - y * Math.sin(theta));
+            points[1][i] = (int)Math.round(x * Math.sin(theta) + y * Math.cos(theta));
+        }
+   
+        translate(x1, y1);
+
+        plot();
+
+    }
+
+    public void reflectX(){
+        int x1, y1;
+        x1 = points[0][0];
+        y1 = points[1][0];
+
+        translate(-x1, -y1);
+        
+        for(int i=0; i<insertedPoints; i++){
+            points[1][i] *= -1;
+        }
+   
+        translate(x1, y1);
+
+        plot();
+    }
+
+    public void reflectY(){
+        int x1, y1;
+        x1 = points[0][0];
+        y1 = points[1][0];
+
+        translate(-x1, -y1);
+        
+        for(int i=0; i<insertedPoints; i++){
+            points[0][i] *= -1;
+        }
+   
+        translate(x1, y1);
+
+        plot();
+    }
+
+    public void reflectXY(){
+        int x1, y1;
+        x1 = points[0][0];
+        y1 = points[1][0];
+
+        translate(-x1, -y1);
+        
+        for(int i=0; i<insertedPoints; i++){
+            points[0][i] *= -1;
+            points[1][i] *= -1;
+        }
+   
+        translate(x1, y1);
+
+        plot();
+    }
+
+
 }
