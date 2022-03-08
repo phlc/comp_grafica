@@ -17,10 +17,12 @@ class Canvas extends JPanel{
     //Atributos
     public int points[][];
     public int maxPoints;
+    public int clipArea[][];
+    public int clipPointsInserted;
     public int insertedPoints;
     public BufferedImage buffer;
     public int color;
-    public boolean isLine, isCircle, isPolygon;
+    public boolean isLine, isCircle, isPolygon, isCohen;
     public boolean isDDA, isBresenham;
 
     
@@ -30,7 +32,9 @@ class Canvas extends JPanel{
         points = new int[2][12];
         insertedPoints=0;
         maxPoints = 2;
-        isLine = isDDA = true;
+        clipArea = new int[2][2];
+        clipPointsInserted = 0;
+        isLine = isDDA = isCohen = true;
         isCircle = isPolygon = isBresenham = false;
         color = Color.black.getRGB();
         buffer = new BufferedImage(500, 500, BufferedImage.TYPE_INT_ARGB);
@@ -84,6 +88,8 @@ class Canvas extends JPanel{
             }
         }
         insertedPoints=0;
+        clipPointsInserted=0;
+        isCohen = true;
         repaint();
     }
 
@@ -262,8 +268,8 @@ class Canvas extends JPanel{
         for(int i=0; i<insertedPoints; i++){
             double x = (double) points[0][i];
             double y = (double) points[1][i];
-            points[0][i] = (int)Math.round(x * Math.cos(theta) - y * Math.sin(theta));
-            points[1][i] = (int)Math.round(x * Math.sin(theta) + y * Math.cos(theta));
+            points[0][i] = (int)Math.round(x * Math.cos(theta*Math.PI/180) - y * Math.sin(theta*Math.PI/180));
+            points[1][i] = (int)Math.round(x * Math.sin(theta*Math.PI/180) + y * Math.cos(theta*Math.PI/180));
         }
    
         translate(x1, y1);
@@ -319,6 +325,30 @@ class Canvas extends JPanel{
         translate(x1, y1);
 
         plot();
+    }
+
+    public void addPointClipArea(int x, int y){
+        if(clipPointsInserted < 2){
+            clipArea[0][clipPointsInserted] = x;
+            clipArea[1][clipPointsInserted] = y;
+            clipPointsInserted++;
+       
+            //Call Clipping Algorithm
+            if(clipPointsInserted==2){    
+                if(isCohen) clipCohen();
+                else clipLiang();
+                
+                clipPointsInserted = 0;
+            }
+        }
+    }
+
+    private void clipCohen(){
+        System.out.print("Cohen");
+    }
+
+    private void clipLiang(){
+        System.out.println("Liang");
     }
 
 

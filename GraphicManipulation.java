@@ -8,6 +8,8 @@ import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
+import java.awt.Font;
+
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -77,6 +79,12 @@ class App extends JFrame implements ActionListener, MouseInputListener{
     JButton reflectionXY;
 
     //Recorte
+    JPanel clippingPanel;
+    JLabel clippingLabel;
+    JRadioButton cohenBtn;
+    JRadioButton liangBtn;
+    ActionButton setClippingBtn;
+    ActionButton undoBtn;
 
 
 
@@ -252,7 +260,45 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         reflectionXY.setBounds(734, 162, 60, 30);
         reflectionXY.setOpaque(true);
         reflectionXY.addMouseListener(this);
+
+        //Configurações Componentes de Recorte
+        clippingPanel = new JPanel();
+        clippingPanel.setBounds(504, 194, 294, 70);
+        clippingPanel.setLayout(null);
         
+        clippingLabel = new JLabel("Clipping:");
+        clippingLabel.setBounds(4, 0, 60, 30);
+        clippingPanel.add(clippingLabel);
+
+        cohenBtn = new JRadioButton("Cohen-Sutherland", true);
+        cohenBtn.setBounds(62, 0, 138, 30);
+        cohenBtn.setOpaque(true);
+        Font newRadioButtonFont=new Font(cohenBtn.getFont().getName(),cohenBtn.getFont().getStyle(),11);
+        cohenBtn.setFont(newRadioButtonFont);
+        cohenBtn.addMouseListener(this);
+
+        liangBtn = new JRadioButton("Liang-Barsky");
+        liangBtn.setBounds(194, 0, 110, 30);
+        liangBtn.setOpaque(true);
+        liangBtn.setFont(newRadioButtonFont);
+        liangBtn.addMouseListener(this);
+
+        ButtonGroup clippingGroup = new ButtonGroup();
+        clippingGroup.add(cohenBtn); clippingGroup.add(liangBtn);
+        clippingPanel.add(cohenBtn);
+        clippingPanel.add(liangBtn);
+
+        setClippingBtn = new ActionButton("Select Two Points");
+        setClippingBtn.setBounds(4, 32, 200, 30);
+        setClippingBtn.setOpaque(true);
+        setClippingBtn.addMouseListener(this);
+        clippingPanel.add(setClippingBtn);
+
+        undoBtn = new ActionButton("Undo");
+        undoBtn.setBounds(214, 32, 80, 30);
+        undoBtn.setOpaque(true);
+        undoBtn.addMouseListener(this);
+        clippingPanel.add(undoBtn);
 
         //Montagem dos Componentes
         this.add(canvas);
@@ -274,10 +320,12 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         this.add(reflectionX);
         this.add(reflectionY);
         this.add(reflectionXY);
+        this.add(clippingPanel);
         
         
         //Desabilitar botões de Transformação
         enableTransformations(false);
+        enableClipping(false);
 
         //Mostrar Canvas
         this.setVisible(true);
@@ -322,6 +370,21 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         polygonBtn.setEnabled(enable);
         ddaBtn.setEnabled(enable);
         bresenhamBtn.setEnabled(enable);
+    }
+
+    private void enableClipping(boolean enable){
+        clippingLabel.setEnabled(enable);
+
+        cohenBtn.setEnabled(enable);
+        cohenBtn.setSelected(true);
+
+        liangBtn.setEnabled(enable);
+
+        setClippingBtn.setEnabled(enable);
+        setClippingBtn.pressBtn(false);
+
+        undoBtn.setEnabled(false);
+        undoBtn.pressBtn(false);
     }
 
     //Evento Mouse Click
@@ -377,6 +440,9 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             enableTransformations(true);
             
             enableRadio(false);
+
+            if(!circleBtn.isSelected()) enableClipping(true);
+
         }
         //Controle botão restartBtn
         else if(e.getSource() == restartBtn){
@@ -393,6 +459,8 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             enableRadio(true);
 
             enableTransformations(false);
+
+            enableClipping(false);
 
             translationTextX.setText("");
             translationTextY.setText("");
@@ -550,6 +618,51 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         else if(e.getSource() == reflectionXY && 
                                  reflectionXY.isEnabled()){
             canvas.reflectXY();
+        }
+
+        //Controle botão setClipping
+        else if(e.getSource() == setClippingBtn && !setClippingBtn.isPressed
+                                 && setClippingBtn.isEnabled()){
+            setClippingBtn.pressBtn(true);
+            undoBtn.setEnabled(false);
+            cohenBtn.setEnabled(false);
+            liangBtn.setEnabled(false);
+            enableTransformations(false);
+        }
+
+        //Controle selecionar area de clipping
+        if(e.getSource() == canvas && setClippingBtn.isPressed
+                            && !undoBtn.isEnabled()){
+            if(canvas.clipPointsInserted == 1){
+                undoBtn.setEnabled(true);
+                setClippingBtn.pressBtn(false);
+                setClippingBtn.setEnabled(false);
+            }
+            canvas.addPointClipArea(e.getX(), e.getY());
+        }
+
+        //Controle Botão undoClipping
+        if(e.getSource() == undoBtn && undoBtn.isEnabled()){
+            setClippingBtn.setEnabled(true);
+            setClippingBtn.pressBtn(false);
+            cohenBtn.setEnabled(true);
+            liangBtn.setEnabled(true);
+            undoBtn.setEnabled(false);
+            canvas.plot();
+        }
+
+        //Controle botão cohen-sutherland
+        else if(e.getSource() == cohenBtn && !canvas.isCohen
+                                            && cohenBtn.isEnabled()){
+
+            canvas.isCohen = true;
+        }
+
+        //Controle botão cohen-sutherland
+        else if(e.getSource() == liangBtn && canvas.isCohen
+                                            && liangBtn.isEnabled()){
+
+            canvas.isCohen = false;
         }
 
     }
