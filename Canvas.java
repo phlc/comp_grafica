@@ -17,7 +17,7 @@ class Canvas extends JPanel{
     //Atributos
     public int points[][];
     public int maxPoints;
-    public int clipArea[][];
+    public int minX, maxX, minY, maxY;
     public int clipPointsInserted;
     public int insertedPoints;
     public BufferedImage buffer;
@@ -32,7 +32,6 @@ class Canvas extends JPanel{
         points = new int[2][12];
         insertedPoints=0;
         maxPoints = 2;
-        clipArea = new int[2][2];
         clipPointsInserted = 0;
         isLine = isDDA = isCohen = true;
         isCircle = isPolygon = isBresenham = false;
@@ -328,26 +327,105 @@ class Canvas extends JPanel{
     }
 
     public void addPointClipArea(int x, int y){
-        if(clipPointsInserted < 2){
-            clipArea[0][clipPointsInserted] = x;
-            clipArea[1][clipPointsInserted] = y;
+        if(clipPointsInserted == 0){
+            minX = x;
+            minY = y;
             clipPointsInserted++;
-       
-            //Call Clipping Algorithm
-            if(clipPointsInserted==2){    
-                if(isCohen) clipCohen();
-                else clipLiang();
-                
-                clipPointsInserted = 0;
+        }
+        else if(clipPointsInserted == 1){
+            if(minX>x){
+                maxX = minX;
+                minX = x;
+            }
+            else maxX = x;
+            if(minY>y){
+                maxY = minY;
+                minY = y;
+            }
+            else maxY = y;
+
+            
+            System.out.println("lkdjlk");
+            ready();   
+            for(int i=1; i<insertedPoints; i++){
+                if(isCohen) clipCohen(points[0][i-1], points[1][i-1],
+                                        points[0][i], points[1][i]);
+                else clipLiang(points[0][i-1], points[1][i-1],
+                                points[0][i], points[1][i]);
+            }
+            if(isPolygon){
+                if(isCohen) clipCohen(points[0][insertedPoints-1], points[1][insertedPoints-1],
+                                        points[0][0], points[1][0]);
+                else clipLiang(points[0][insertedPoints-1], points[1][insertedPoints-1],
+                                points[0][0], points[1][0]);
+            }
+            clipPointsInserted = 0;
+            repaint();
+        }
+    }
+
+    private int getCode(int x, int y){
+        int code = 0;
+
+        if(x < minX) code+=1;
+        if(x > maxX) code+=2;
+        if(y < minY) code+=4;
+        if(y > maxY) code+=8;
+
+        return code;
+    }
+
+    private void clipCohen(int x1, int y1, int x2, int y2){
+        boolean aceite, feito;
+        aceite = feito = false;
+        int c1, c2, cfora;
+
+        while(!feito){
+            c1 = getCode(x1, y1);
+            c2 = getCode(x2, y2);
+            if(c1==0 && c2==0){
+                aceite = feito = true;
+            }
+            else if((c1&c2) !=0) feito = true;
+            else{
+                double xint, yint;
+                xint = yint = 0.0;
+
+                if(c1!=0) cfora = c1;
+                else cfora = c2;
+
+                if(((cfora&1) == 1)){
+                    xint = (double) minX;
+                    yint = y1 + (y2-y1)*(double)(minX-x1)/(x2-x1);
+                }
+                else if(((cfora&2) == 2)){
+                    xint = (double) maxX;
+                    yint = y1 + (y2-y1)*(double)(maxX-x1)/(x2-x1);
+                }
+                else if(((cfora&4) == 4)){
+                    yint = (double) minY;
+                    xint = x1 + (x2-x1)*(double)(minY-y1)/(y2-y1);
+                }
+                else if(((cfora&8) == 8)){
+                    yint = (double) maxY;
+                    xint = x1 + (x2-x1)*(double)(maxY-y1)/(y2-y1);
+                }
+                if(c1==cfora){
+                    x1 = (int)Math.round(xint);
+                    y1 = (int)Math.round(yint);
+                }
+                else{
+                    x2 = (int)Math.round(xint);
+                    y2 = (int)Math.round(yint);
+                }
+            }
+            if(aceite){
+                plotLineBresenham(x1, y1, x2, y2);
             }
         }
     }
 
-    private void clipCohen(){
-        System.out.print("Cohen");
-    }
-
-    private void clipLiang(){
+    private void clipLiang(int x1, int y1, int x2, int y2){
         System.out.println("Liang");
     }
 

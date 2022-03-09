@@ -660,7 +660,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
         //Controle botão cohen-sutherland
         else if(e.getSource() == liangBtn && canvas.isCohen
-                                            && liangBtn.isEnabled()){
+                                          && liangBtn.isEnabled()){
 
             canvas.isCohen = false;
         }
