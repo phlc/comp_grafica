@@ -18,6 +18,7 @@ class Canvas extends JPanel{
     public int points[][];
     public int maxPoints;
     public int minX, maxX, minY, maxY;
+    public double u1, u2;
     public int clipPointsInserted;
     public int insertedPoints;
     public BufferedImage buffer;
@@ -344,8 +345,6 @@ class Canvas extends JPanel{
             }
             else maxY = y;
 
-            
-            System.out.println("lkdjlk");
             ready();   
             for(int i=1; i<insertedPoints; i++){
                 if(isCohen) clipCohen(points[0][i-1], points[1][i-1],
@@ -425,8 +424,40 @@ class Canvas extends JPanel{
         }
     }
 
+    private boolean cliptest(int p, int q){
+        boolean result = true;
+        double r = (double) q/p;
+        if(p<0){
+            if(r>u2) result = false;
+            else if(r>u1) u1 = r;
+        }
+        else if(p>0){
+            if(r<u1) result = false;
+            else if(r<u2) u2 = r;
+        }
+        else if(q<0) result = false;
+        return result;
+    }
+
     private void clipLiang(int x1, int y1, int x2, int y2){
-        System.out.println("Liang");
+        u1 = 0.0; u2 = 1.0;
+        int dx = x2 - x1;
+        int dy = y2 - y1;
+
+        if(cliptest(-dx, x1-minX))
+            if(cliptest(dx, maxX-x1))
+                if(cliptest(-dy, y1-minY))
+                    if(cliptest(dy, maxY-y1)){
+                        if(u2 < 1.0){
+                            x2 = (int)Math.round(x1 + u2*dx);
+                            y2 = (int)Math.round(y1 + u2*dy);
+                        }
+                        if(u1 > 0.0){
+                            x1 = (int)Math.round(x1 + u1*dx);
+                            y1 = (int)Math.round(y1 + u1*dy);
+                        }
+                        plotLineBresenham(x1, y1, x2, y2);
+                    }
     }
 
 
