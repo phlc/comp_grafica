@@ -88,7 +88,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
 
 
-    //Construtor da Classe MyFrame
+    //Construtor da Classe App
     public App(){
 
         //Inicialização do canvas
@@ -332,6 +332,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
     }
 
+    //Método para Habilitar e Desabilitar os botões de Transformação
     private void enableTransformations(boolean enable){
 
         //Translação
@@ -364,6 +365,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         reflectionXY.setEnabled(enable);
     }
 
+    //Método para Habilitar e Desabilitar os botões de tipo de figura
     private void enableRadio(boolean enable){
         lineBtn.setEnabled(enable);
         circleBtn.setEnabled(enable);
@@ -372,6 +374,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         bresenhamBtn.setEnabled(enable);
     }
 
+    //Método para Habilitar e Desabilitar componentes de recorte
     private void enableClipping(boolean enable){
         clippingLabel.setEnabled(enable);
 
@@ -387,13 +390,14 @@ class App extends JFrame implements ActionListener, MouseInputListener{
         undoBtn.pressBtn(false);
     }
 
-    //Evento Mouse Click
+    //Evento Mouse Mouse Pressed
     @Override
     public void mousePressed(MouseEvent e) {
-        //Adicionar pontos no canvas
+        //Captura clique de pontos no canvas
         if(e.getSource() == canvas && setPointsBtn.isPressed){
             canvas.addPoint(e.getX(), e.getY());
         }
+
         //Controle botão setPointsBtn
         else if(e.getSource() == setPointsBtn && !setPointsBtn.isPressed 
                                               && setPointsBtn.isEnabled()){
@@ -408,6 +412,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             restartBtn.pressBtn(false);
             enableRadio(false);
         }
+
         //Controle botão plotBtn
         else if(e.getSource() == plotBtn && !plotBtn.isPressed 
                                          && plotBtn.isEnabled()){
@@ -424,6 +429,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
             canvas.plot();
         }
+
         //Controle botão transformBtn
         else if(e.getSource() == transformBtn && !transformBtn.isPressed 
                                               && transformBtn.isEnabled()){
@@ -444,6 +450,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             if(!circleBtn.isSelected()) enableClipping(true);
 
         }
+
         //Controle botão restartBtn
         else if(e.getSource() == restartBtn){
             setPointsBtn.pressBtn(false);
@@ -472,11 +479,13 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
             canvas.clear();
         }
-        //Controle botão pickColer
+
+        //Controle botão pickColor
         else if(e.getSource() == pickColor){
             Color choice = JColorChooser.showDialog(canvas, "Choose your Color", Color.BLACK);
             if(choice != null) canvas.color = choice.getRGB();
         }
+
         //Controle botão lineBtn
         else if(e.getSource() == lineBtn && !canvas.isLine 
                                          && lineBtn.isEnabled()){
@@ -497,6 +506,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
             scaleLabelX.setBounds(4, 0, 100, 30);
 
         }
+
         //Controle botão circleBtn
         else if(e.getSource() == circleBtn && !canvas.isCircle      
                                            && circleBtn.isEnabled()){
@@ -518,6 +528,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
             
         }
+
         //Controle botão polygonBtn
         else if(e.getSource() == polygonBtn && !canvas.isPolygon 
                                             && polygonBtn.isEnabled()){
@@ -667,7 +678,7 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
     }
 
-    //Métodos das Interfaces
+    //Métodos Obrigatórios das Interfaces
     @Override
     public void actionPerformed(ActionEvent e) {
     }
@@ -693,9 +704,10 @@ class App extends JFrame implements ActionListener, MouseInputListener{
 
 }
 
-
+//Main class
 public class GraphicManipulation{
     
+    //Main
     public static void main(String args[]){
 
         //Inicialização do App

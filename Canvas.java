@@ -85,7 +85,7 @@ class Canvas extends JPanel{
         }
     }
 
-    //Método para colorir um ponto na estrurua de dados da imagem
+    //Método para colorir um ponto na estrutura de dados da imagem
     private void renderPoint(int x, int y){
         if(x<500 && x>=0 && y<500 && y>=0)
             buffer.setRGB(x, y, color);
@@ -359,10 +359,16 @@ class Canvas extends JPanel{
             minX = x;
             minY = y;
             clipPointsInserted++;
+            drawPoint(x, y); //desenhar ponto clicado
         }
 
         //Segundo ponto
         else if(clipPointsInserted == 1){
+            ready();
+            drawPoint(minX, minY); //redesenhar primeiro ponto clicado
+            drawPoint(x, y); //desenhar segundo ponto clicado
+
+            //Setar minX, minY, maxX, maxY
             if(minX>x){
                 maxX = minX;
                 minX = x;
@@ -374,8 +380,17 @@ class Canvas extends JPanel{
             }
             else maxY = y;
 
+            //Desenhar Janela Pontilhada
+            for(int i=minX; i<maxX; i+=3){
+                renderPoint(i, minY);
+                renderPoint(i, maxY);
+            }
+            for(int i=minY; i<maxY; i+=3){
+                renderPoint(minX, i);
+                renderPoint(maxX, i);
+            }
+
             //Executar algoritmos de recorte para cada segmento de reta
-            ready();   
             for(int i=1; i<insertedPoints; i++){
                 if(isCohen) clipCohen(points[0][i-1], points[1][i-1],
                                         points[0][i], points[1][i]);
@@ -397,6 +412,7 @@ class Canvas extends JPanel{
         }
     }
 
+    //Função para gerar código de localização dos pontos para Cohen-Sutherland
     private int getCode(int x, int y){
         int code = 0;
 
@@ -408,6 +424,7 @@ class Canvas extends JPanel{
         return code;
     }
 
+    //Método de recorte Cohen-Sutherland
     private void clipCohen(int x1, int y1, int x2, int y2){
         boolean aceite, feito;
         aceite = feito = false;
@@ -458,6 +475,7 @@ class Canvas extends JPanel{
         }
     }
 
+    //Função de teste para o método de recorte Liang-Barsky
     private boolean cliptest(int p, int q){
         boolean result = true;
         double r = (double) q/p;
@@ -473,6 +491,7 @@ class Canvas extends JPanel{
         return result;
     }
 
+    //Método de recorte Liang-Barsky
     private void clipLiang(int x1, int y1, int x2, int y2){
         u1 = 0.0; u2 = 1.0;
         int dx = x2 - x1;
