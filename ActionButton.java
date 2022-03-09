@@ -5,10 +5,10 @@ Pedro Henrique Lima Carvalho - 651230
 */
 
 import java.awt.Color;
-
 import javax.swing.JButton;
 
 //Classe Para Botões de Ações
+//Apenas adiciona o atributo isPressed e método de manipulação do atributo
 class ActionButton extends JButton{
     //Atributos
     public boolean isPressed;

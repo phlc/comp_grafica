@@ -6,7 +6,6 @@ Pedro Henrique Lima Carvalho - 651230
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.Graphics;
@@ -15,22 +14,26 @@ import java.awt.Graphics2D;
 //Classe do Canvas para Desenho
 class Canvas extends JPanel{
     //Atributos
-    public int points[][];
-    public int maxPoints;
-    public int minX, maxX, minY, maxY;
-    public double u1, u2;
-    public int clipPointsInserted;
-    public int insertedPoints;
-    public BufferedImage buffer;
-    public int color;
-    public boolean isLine, isCircle, isPolygon, isCohen;
-    public boolean isDDA, isBresenham;
+    public int points[][]; //estrutura de armazenamento dos pontos das figuras geométricas
+    public int maxPoints; //número máximo de pontos
+    public int insertedPoints; //número de pontos inseridos na estrutura
+
+    public int minX, maxX, minY, maxY; //coordenadas do recorte
+    public double u1, u2; //variáveis de recorte para Liang-Barsky
+    public int clipPointsInserted; //controle de entrada de pontos para o recorte
+
+    public BufferedImage buffer; //estrutura de armazenamento da imagem
+    public int color; //cor da linha
+    public boolean isLine, isCircle, isPolygon; //variáveis de controle do tipo de figura
+    public boolean isDDA, isBresenham; //variáveis de controle do algoritmo de renderização de linhas
+    public boolean isCohen; //variável de controle do algoritmo de recorde (false = Liang-Barsky)
 
     
 
-    //Construtores
+    //Construtor
     public Canvas(){
-        points = new int[2][12];
+        //Configurações Padrão - Reta - DDA - Cohen - Cor Preta
+        points = new int[2][12]; 
         insertedPoints=0;
         maxPoints = 2;
         clipPointsInserted = 0;
@@ -41,7 +44,9 @@ class Canvas extends JPanel{
         clear();
     }
 
-    //Metodos
+    //Métodos
+
+    //Método do JFrama para desenhar na tela
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g.create();
@@ -49,6 +54,8 @@ class Canvas extends JPanel{
         g2d.dispose();
     }
 
+    //Método para desenhar pequena cruz na tela quando 
+    // da marcação dos pontos melhorar a visualização
     public void drawPoint(int x, int y){
         renderPoint(x, y);
         if(x>0) renderPoint(x-1, y);
@@ -59,14 +66,16 @@ class Canvas extends JPanel{
         repaint();
     }
 
+    //Método para incluir um ponto na estrutura
     public void addPoint(int x, int y){
         if(insertedPoints < maxPoints){
-            points[0][insertedPoints] = x;
-            points[1][insertedPoints] = y;
+            points[0][insertedPoints] = x; //[0][n] eixo x
+            points[1][insertedPoints] = y; //[1][n] eixo y
             insertedPoints++;
 
             drawPoint(x, y);
         }
+        // Máximo de pontos atingidos
         else{
             String type = "";
             if(isLine) type = "line";
@@ -76,15 +85,17 @@ class Canvas extends JPanel{
         }
     }
 
+    //Método para colorir um ponto na estrurua de dados da imagem
     private void renderPoint(int x, int y){
         if(x<500 && x>=0 && y<500 && y>=0)
             buffer.setRGB(x, y, color);
     }
 
+    //Método para reiniciar a tela as variáveis de controle
     public void clear(){
         for(int i=0; i<500; i++){
             for(int j=0; j<500; j++){
-                buffer.setRGB(i, j, Color.gray.getRGB());
+                buffer.setRGB(i, j, Color.gray.getRGB()); //Cor cinza para simular desabilitada
             }
         }
         insertedPoints=0;
@@ -93,6 +104,7 @@ class Canvas extends JPanel{
         repaint();
     }
 
+    //Método para colorir a tela de branco simulando habilitada
     public void ready(){
         for(int i=0; i<500; i++){
             for(int j=0; j<500; j++){
@@ -102,6 +114,7 @@ class Canvas extends JPanel{
         repaint();
     }
 
+    //Método para desenhar as figura geométricas
     public void plot(){
         ready();
         if(this.isLine){
@@ -116,7 +129,7 @@ class Canvas extends JPanel{
         }
         else if(this.isCircle){
             plotCircle(points[0][0], points[1][0],
-                       points[0][1], points[1][1]);
+                       points[0][1], points[1][1]); //centro e raio
         }
         else if(this.isPolygon){
             plotPolygon();
@@ -124,6 +137,7 @@ class Canvas extends JPanel{
         repaint();
     }
 
+    //Método DDA para renderização de linhas
     private void plotLineDDA(int x1, int y1, int x2, int y2){
         int dx, dy, steps;
         double addX, addY, x, y;
@@ -147,6 +161,7 @@ class Canvas extends JPanel{
         }
     }
 
+    //Método Bresenham para renderização de linhas
     private void plotLineBresenham(int x1, int y1, int x2, int y2){
         int dx, dy, x, y, c1, c2, p, addX, addY;
 
@@ -186,6 +201,7 @@ class Canvas extends JPanel{
         }
     }
 
+    //Método renderizar todos os pontos espelhados a partir do ponto do 2 octante
     private void renderCirclePoints(int xc, int yc, int x, int y){
         renderPoint(xc+x, yc+y);
         renderPoint(xc-x, yc+y);
@@ -197,6 +213,7 @@ class Canvas extends JPanel{
         renderPoint(xc-y, yc-x);
     }
 
+    //Método para calcular os pontos do círculo no 2 octante
     private void plotCircle(int xc, int yc, int x2, int y2){
         int x, y, p, r;
 
@@ -204,16 +221,18 @@ class Canvas extends JPanel{
         r = (int)Math.round(Math.sqrt((x2-xc)*(x2-xc) + (y2-yc)*(y2-yc)));
 
         x = 0; y = r; p = 3 - 2*r;
+
         renderCirclePoints(xc, yc, x, y);
+
         while(x<y){
             if(p<0) p += 4*x + 6;
             else{ p += 4*(x-y) + 10; y-=1;}
             x+=1;
             renderCirclePoints(xc, yc, x, y);
-        }
-        
+        }        
     }
 
+    //Método para renderizar polígonos a partir de todos segmentos de reta componentes
     private void plotPolygon(){
         if(this.isDDA){
             for(int i=1; i<this.insertedPoints; i++){
@@ -233,6 +252,7 @@ class Canvas extends JPanel{
         }
     }
 
+    //Método de Translação
     public void translate(int x, int y){
         for(int i=0; i<insertedPoints; i++){
             points[0][i] += x;
@@ -241,29 +261,31 @@ class Canvas extends JPanel{
         plot();
     }
 
+    //Método de Escala
     public void scale(double x, double y){
         int x1, y1;
         x1 = points[0][0];
         y1 = points[1][0];
 
-        translate(-x1, -y1);
+        translate(-x1, -y1); //translação do ponto fixo para origem (primeiro ponto inserido)
         
         for(int i=0; i<insertedPoints; i++){
             points[0][i] *= x;
             points[1][i] *= y;
         }
    
-        translate(x1, y1);
+        translate(x1, y1); //reverter translação
 
         plot();
     }
 
+    //Método de Rotação
     public void rotate(double theta){
         int x1, y1;
         x1 = points[0][0];
         y1 = points[1][0];
 
-        translate(-x1, -y1);
+        translate(-x1, -y1); //translação do ponto fixo para origem (primeiro ponto inserido)
         
         for(int i=0; i<insertedPoints; i++){
             double x = (double) points[0][i];
@@ -272,67 +294,74 @@ class Canvas extends JPanel{
             points[1][i] = (int)Math.round(x * Math.sin(theta*Math.PI/180) + y * Math.cos(theta*Math.PI/180));
         }
    
-        translate(x1, y1);
+        translate(x1, y1); //reverter translação
 
         plot();
 
     }
 
+    //Método de reflexão pelo eixo X
     public void reflectX(){
         int x1, y1;
         x1 = points[0][0];
         y1 = points[1][0];
 
-        translate(-x1, -y1);
+        translate(-x1, -y1); //translação do ponto fixo para origem (primeiro ponto inserido)
         
         for(int i=0; i<insertedPoints; i++){
             points[1][i] *= -1;
         }
    
-        translate(x1, y1);
+        translate(x1, y1); //reverter translação
 
         plot();
     }
 
+    //Método de reflexão pelo eixo Y
     public void reflectY(){
         int x1, y1;
         x1 = points[0][0];
         y1 = points[1][0];
 
-        translate(-x1, -y1);
+        translate(-x1, -y1); //translação do ponto fixo para origem (primeiro ponto inserido)
         
         for(int i=0; i<insertedPoints; i++){
             points[0][i] *= -1;
         }
    
-        translate(x1, y1);
+        translate(x1, y1); //reverter translação
 
         plot();
     }
 
+    //Método de reflexão pela origem
     public void reflectXY(){
         int x1, y1;
         x1 = points[0][0];
         y1 = points[1][0];
 
-        translate(-x1, -y1);
+        translate(-x1, -y1); //translação do ponto fixo para origem (primeiro ponto inserido)
         
         for(int i=0; i<insertedPoints; i++){
             points[0][i] *= -1;
             points[1][i] *= -1;
         }
    
-        translate(x1, y1);
+        translate(x1, y1);//reverter translação
 
         plot();
     }
 
+    //Método para Seleção de área de recorte e execução do recorte
     public void addPointClipArea(int x, int y){
+        //Primeiro ponto
         if(clipPointsInserted == 0){
             minX = x;
             minY = y;
             clipPointsInserted++;
         }
+
+        //Segundo ponto
         else if(clipPointsInserted == 1){
             if(minX>x){
                 maxX = minX;
@@ -345,6 +374,7 @@ class Canvas extends JPanel{
             }
             else maxY = y;
 
+            //Executar algoritmos de recorte para cada segmento de reta
             ready();   
             for(int i=1; i<insertedPoints; i++){
                 if(isCohen) clipCohen(points[0][i-1], points[1][i-1],
@@ -352,12 +382,16 @@ class Canvas extends JPanel{
                 else clipLiang(points[0][i-1], points[1][i-1],
                                 points[0][i], points[1][i]);
             }
+
+            //Último segmento polígono n <-> 0
             if(isPolygon){
                 if(isCohen) clipCohen(points[0][insertedPoints-1], points[1][insertedPoints-1],
                                         points[0][0], points[1][0]);
                 else clipLiang(points[0][insertedPoints-1], points[1][insertedPoints-1],
                                 points[0][0], points[1][0]);
             }
+
+            //reinicialiar variável de controle
             clipPointsInserted = 0;
             repaint();
         }
